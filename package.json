@@ -1,0 +1,15 @@
+{
+  "name": "mac-network-drive",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "author": "Florent Cardoen <f.cardoen@me.com>",
+  "license": "ISC",
+  "dependencies": {
+    "applescript": "^1.0.0",
+    "child-process-promise": "^2.2.1"
+  }
+}
