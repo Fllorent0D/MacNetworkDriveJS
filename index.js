@@ -26,7 +26,7 @@ const macNetworkDrive = {
         for (let line of pathList) {
           let matches = line.match(re);
           if (matches) {
-            drivePath["\\\\" + matches[1].replace('/', '\\')] = matches[2]
+            drivePath["\\\\" + matches[1].replace('/', '\\') + "\\"] = matches[2];
           }
         }
         resolve(drivePath)
@@ -52,6 +52,9 @@ const macNetworkDrive = {
             continue;
           }
 
+          if (drivePath.charAt(drivePath.length - 1) != "\\")
+            drivePath += "\\"
+
           if (currentDrivePath.toUpperCase() === drivePath.toUpperCase()) {
             resolve(networkDrives[currentDrivePath]);
           }
@@ -67,43 +70,43 @@ const macNetworkDrive = {
     /* parametetr localPath is unused -> allow to have the same signature */
     let completePromise = new Promise((resolve, reject) => {
 
-      let test = macNetworkDrive.find(drivePath).then(result=>{
-        if(result != undefined){
+      let test = macNetworkDrive.find(drivePath).then(result => {
+        if (result !== undefined) {
           resolve(result)
-          return;
+        } else {
+          let connectPath = ""
+          let serverPath = drivePath
+
+          if (username != null && password != null) {
+            username = username.replace("\\", "\\\\")
+            connectPath = `${username}:${password}@`
+          }
+
+          serverPath = serverPath.replace("\\\\", "")
+          serverPath = serverPath.replace("\\", "/")
+
+          let pathDrive = `smb://${connectPath}${serverPath}`
+          let mountScript = `
+            tell application "Finder"
+            with timeout of 2 seconds
+              try
+                mount volume "${pathDrive}"
+              end try
+              end timeout
+            end tell`
+
+          applescript.execString(mountScript, (err, result) => {
+            if (err || result === undefined) {
+              if (err === undefined)
+                reject("Unable to connect")
+
+              reject(err)
+            }
+            macNetworkDrive.find(drivePath).then(result => {
+              resolve(result)
+            })
+          })
         }
-      })
-
-      let connectPath = ""
-      let serverPath = drivePath
-
-      if (username != null && password != null) {
-        username = username.replace("\\", "\\\\")
-        connectPath = `${username}:${password}@`
-      }
-
-      serverPath = serverPath.replace("\\\\", "")
-      serverPath = serverPath.replace("\\", "/")
-
-      let pathDrive = `smb://${connectPath}${serverPath}`
-      let mountScript = `
-        tell application "Finder"
-        with timeout of 2 seconds
-          try
-            mount volume "${pathDrive}"
-          end try
-          end timeout
-        end tell`
-      applescript.execString(mountScript, (err, result) => {
-        if (err || result === undefined) {
-          if (err === undefined)
-            reject("Unable to connect")
-
-          reject(err)
-        }
-        macNetworkDrive.find(drivePath).then(result=>{
-          resolve(result)
-        })
       })
     })
     return completePromise;
