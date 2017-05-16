@@ -1,15 +1,22 @@
 {
   "name": "mac-network-drive",
-  "version": "1.0.0",
-  "description": "",
+  "version": "1.0.1",
+  "description": "Allows you to list/find/(un)mount network drives on macOS from Node.JS",
   "main": "index.js",
+  "repository" : "https://github.com/Fllorent0D/MacNetworkDriveJS",
   "scripts": {
     "test": "node test.js"
   },
+  "keywords" : ["mac", "network", "drive", "smb", "mount", "list"],
   "author": "Florent Cardoen <f.cardoen@me.com>",
   "license": "ISC",
   "dependencies": {
     "applescript": "^1.0.0",
     "child-process-promise": "^2.2.1"
+  },
+  "os":["darwin"],
+  "bugs":{ 
+  	"url" : "https://github.com/Fllorent0D/MacNetworkDriveJS/issues", 
+  	"email" : "f.cardoen@me.com"
   }
 }
